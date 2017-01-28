@@ -1,10 +1,12 @@
-# Generate network parameters of Inception v3 based retrained model to be in iOS MPSCNNConvolution
+# Generate network parameters of Inception v3 based retrained model to be used in iOS MPSCNNConvolution
 
-This is based on the repo [Convert Inception v3 batch-normalized weights into weights and biases for MPSCNNConvolution](https://github.com/kakugawa/MetalCNNWeights). What's added is a modified Python version of convert.py to deal with a retrained Inception v3 model, as described in TensorFlow's [How to Retrain Image] (https://www.tensorflow.org/how_tos/image_retraining/) and [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets), and the modified iOS code based on Apple's MetalImageRecognition that can better recognize dog breeds.
+This is based on the repo [Convert Inception v3 batch-normalized weights into weights and biases for MPSCNNConvolution](https://github.com/kakugawa/MetalCNNWeights), with the following changes:
+1. A modified Python version of convert.py to deal with a retrained Inception v3 model, as described in TensorFlow's [How to Retrain Image] (https://www.tensorflow.org/how_tos/image_retraining/) and [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets);
+2. Modified iOS code based on Apple's MetalImageRecognition sample to use the converted network parameters of a retrained model for better dog breed recognition than the original MetalImageRecognition sample, which uses the Inception v3 model's network parameters.
 
 ## Convert a retrained Inception v3 model
 
-Run `python convert_doggy.py`, which differs from the `convert.py` in the original repo by replacing in `def softmax_write(output_dir, dat_dir, sess):`
+Run `python convert_doggy.py`, changed from the `convert.py` in the original repo by replacing in `def softmax_write(output_dir, dat_dir, sess):`
 ```
 name = 'softmax'
 
@@ -21,10 +23,10 @@ weights = sess.graph.get_tensor_by_name('final_training_ops/weights/final_weight
 biases  = sess.graph.get_tensor_by_name('final_training_ops/biases/final_biases:0' ).eval()
 ```
 
-This will generate in the output_doggy folder two new files (`bias_final_training_ops.dat` and `weights_final_training_ops.dat`), along with all the previous layers’ weights and biases dat files.
+This will generate in the `output_doggy` folder two new files (`bias_final_training_ops.dat` and `weights_final_training_ops.dat`), along with all the previous layers’ weights and biases dat files.
 
-### How did I get the right tensor name for the retrained model?
-I used the following code to generate the original Inception v3 and the retrained models' graphs to be visualized by TensorBoard:
+#### *How did I get the right tensor name for the retrained model?
+I used the following code to generate the original Inception v3 model and the retrained model's graphs to be visualized by TensorBoard:
 ```
 import os
 import os.path
@@ -47,12 +49,12 @@ with tf.Session() as sess:
     writer.close()
 ```
 
-Then you can run `tensorboard --logdir /tmp/inception_v3_log` or `tensorboard --logdir /tmp/dog_retrained_log` to find out in TensorBoard's Graph section the details of the softmax layer of the original Inception v3 model or the last layer, which replaces the original softmax layer, in the retrained model.
+Then you can run `tensorboard --logdir /tmp/inception_v3_log` or `tensorboard --logdir /tmp/dog_retrained_log` to find out in the TensorBoard's Graph section the details of the softmax layer of the original Inception v3 model or the last layer, which replaces the original softmax layer, in the retrained model.*
 
-## Use the last layer's parameters in iOS
-First, download Apple's [MetalImageRecognition sample](https://developer.apple.com/library/prerelease/content/samplecode/MetalImageRecognition/Introduction/Intro.html) - you may want to run the sample first to see how it does image recognition of the 1000 classes.
+## Use network parameters of the retrained model in iOS
+First, download Apple's [MetalImageRecognition sample](https://developer.apple.com/library/prerelease/content/samplecode/MetalImageRecognition/Introduction/Intro.html) - you may want to run the sample first to see how it does image recognition of the 1000 ImageNet classes.
 
-Then, drag the two new parameter files generated, `bias_final_training_ops.dat` and `weights_final_training_ops.dat`, in the output_doggy folder to the iOS sample's Inception_v3_Network_Params' binaries folder - you can also copy all the files in the output_doggy folder.
+Then, drag the two new parameter files generated, `bias_final_training_ops.dat` and `weights_final_training_ops.dat`, in the `output_doggy` folder to the iOS sample's Inception_v3_Network_Params' binaries folder in Xcode - you can also copy all the files in the `output_doggy` folder.
 
 After that, at the end of the `init` functioin of `Inception3Net.swift`, replace:
 ```
@@ -89,7 +91,9 @@ Finally, replace the `labels` value at the end of `Inceptioin3Net.swift` with th
 ...
 ```
 
-Run the MetalImageRecognition app now on a device and you'll see the app does dog breed recognition more accurately than the original sample, which can also recognize dog breeds, among other classes, but in a less accurately way, because our modified version uses a specifically dog breed retrained model.
+The final code of `Inception3Net.swift` is included in this repo.
+
+Run the MetalImageRecognition app now on a device and you'll see the app does dog breed recognition more accurately than the original sample, which can also recognize dog breeds, among 1000 classes, but in a less accurately way, because our modified version uses a specifically dog breed retrained model.
 
 ## Dependencies
 
@@ -98,4 +102,4 @@ Run the MetalImageRecognition app now on a device and you'll see the app does do
 - [Tensorflow](https://www.tensorflow.org/)
 
 ## Using TensorFlow APIs in iOS
-An iOS app that uses TensorFlow's API, instead of the Apple's Metal Performance Shaders framework, to do image recognition based on an retrained Inception v3 model is described in my blog [What Kind of Dog Is It - Using TensorFlow on Mobile Device](http://jeffxtang.github.io/deep/learning,/tensorflow,/mobile,/ai/2016/09/23/mobile-tensorflow.html).
+An iOS app that uses Google's TensorFlow API, instead of the Apple's Metal Performance Shaders framework, to do image recognition based on an retrained Inception v3 model is described in my blog [What Kind of Dog Is It - Using TensorFlow on Mobile Device](http://jeffxtang.github.io/deep/learning,/tensorflow,/mobile,/ai/2016/09/23/mobile-tensorflow.html).

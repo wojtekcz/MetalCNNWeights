@@ -213,7 +213,7 @@ def main():
     #url_download_extract(input_dir, inception3_url)
 
     # ===== OUTPUT
-    #dir_create(output_dir)
+    dir_create(output_dir)
 
     # ----- LOAD
     graph_create(os.path.join(input_dir, 'dog_retrained.pb'))
