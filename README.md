@@ -1,8 +1,8 @@
 # Generate network parameters of Inception v3 based retrained model to be used in iOS MPSCNNConvolution
 
 This is based on the repo [Convert Inception v3 batch-normalized weights into weights and biases for MPSCNNConvolution](https://github.com/kakugawa/MetalCNNWeights), with the following changes:
-1. A modified Python version of convert.py to deal with a retrained Inception v3 model, as described in TensorFlow's [How to Retrain Image] (https://www.tensorflow.org/how_tos/image_retraining/) and [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets);
-2. Modified iOS code based on Apple's MetalImageRecognition sample to use the converted network parameters of a retrained model for better dog breed recognition than the original MetalImageRecognition sample, which uses the Inception v3 model's network parameters.
+ 1. A modified Python version of convert.py to deal with a retrained Inception v3 model, as described in TensorFlow's [How to Retrain Image] (https://www.tensorflow.org/how_tos/image_retraining/) and [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets);
+ 2. Modified iOS code based on Apple's MetalImageRecognition sample to use the converted network parameters of a retrained model for better dog breed recognition than the original MetalImageRecognition sample, which uses the Inception v3 model's network parameters.
 
 ## Convert a retrained Inception v3 model
 
