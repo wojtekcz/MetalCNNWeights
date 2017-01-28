@@ -25,7 +25,7 @@ biases  = sess.graph.get_tensor_by_name('final_training_ops/biases/final_biases:
 
 This will generate in the `output_doggy` folder two new files (`bias_final_training_ops.dat` and `weights_final_training_ops.dat`), along with all the previous layers’ weights and biases dat files.
 
-#### *How did I get the right tensor name for the retrained model?
+### *How did I get the right tensor name for the retrained model?*
 I used the following code to generate the original Inception v3 model and the retrained model's graphs to be visualized by TensorBoard:
 ```
 import os
@@ -49,7 +49,7 @@ with tf.Session() as sess:
     writer.close()
 ```
 
-Then you can run `tensorboard --logdir /tmp/inception_v3_log` or `tensorboard --logdir /tmp/dog_retrained_log` to find out in the TensorBoard's Graph section the details of the softmax layer of the original Inception v3 model or the last layer, which replaces the original softmax layer, in the retrained model.*
+Then you can run `tensorboard --logdir /tmp/inception_v3_log` or `tensorboard --logdir /tmp/dog_retrained_log` to find out in the TensorBoard's Graph section the details of the softmax layer of the original Inception v3 model or the last layer, which replaces the original softmax layer, in the retrained model.
 
 ## Use network parameters of the retrained model in iOS
 First, download Apple's [MetalImageRecognition sample](https://developer.apple.com/library/prerelease/content/samplecode/MetalImageRecognition/Introduction/Intro.html) - you may want to run the sample first to see how it does image recognition of the 1000 ImageNet classes.
