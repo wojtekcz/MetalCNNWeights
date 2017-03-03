@@ -11,6 +11,7 @@ import urllib
 
 import numpy
 import tensorflow
+from functools import reduce
 
 #
 # Constants
@@ -56,18 +57,18 @@ def url_download_extract(download_dir, url):
                             100.0 * float(count*block_size) / float(total_size),
                             ))
         sys.stdout.flush()
-    urllib.urlretrieve(
+    urllib.request.urlretrieve(
         url,
         filepath,
         _reporthook,
         )
-    print ''
+    print('')
 
     fileinfo = os.stat(filepath)
-    print 'Downloaded %s %s bytes.' % (
+    print('Downloaded %s %s bytes.' % (
             filename,
             fileinfo.st_size,
-            )
+            ))
 
     # extract
     tarfile.open(filepath, 'r:gz').extractall(download_dir)
@@ -76,7 +77,7 @@ def url_download_extract(download_dir, url):
 # ----- OUTPUT
 #
 def graph_create(graphpath):
-    with tensorflow.python.platform.gfile.FastGFile(graphpath, 'r') as graphfile:
+    with tensorflow.gfile.FastGFile(graphpath, 'r') as graphfile:
         graphdef = tensorflow.GraphDef()
         graphdef.ParseFromString(graphfile.read())
 
@@ -109,10 +110,10 @@ def conv_write(output_dir, dat_dir, sess, name):
     weights_output = numpy.zeros(reduce(lambda x,y: x*y, weights.shape), numpy.float32)
 
     output_i = 0
-    for l in xrange(weights.shape[3]):
-        for i in xrange(weights.shape[0]):
-            for j in xrange(weights.shape[1]):
-                for k in xrange(weights.shape[2]):
+    for l in range(weights.shape[3]):
+        for i in range(weights.shape[0]):
+            for j in range(weights.shape[1]):
+                for k in range(weights.shape[2]):
                     weights_output[output_i] = weights[i][j][k][l]
                     output_i += 1
 
@@ -132,20 +133,20 @@ def conv_write(output_dir, dat_dir, sess, name):
     biases_dat_filepath  = os.path.join(dat_dir, biases_filename)
     if not os.path.exists(weights_dat_filepath) or \
        not os.path.exists(biases_dat_filepath):
-        print '%-40s' % (name_output,)
+        print('%-40s' % (name_output,))
         return
 
     weights_maxdelta = '?'
     with open(weights_dat_filepath, 'rb') as f:
         weights_dat = numpy.fromstring(f.read(), dtype='<f4')
-        weights_maxdelta = max(map(abs, weights_output - weights_dat))
+        weights_maxdelta = max(list(map(abs, weights_output - weights_dat)))
 
     biases_maxdelta = '?'
     with open(biases_dat_filepath) as f:
         biases_dat = numpy.fromstring(f.read(), dtype='<f4')
-        biases_maxdelta = max(map(abs, biases - biases_dat))
+        biases_maxdelta = max(list(map(abs, biases - biases_dat)))
 
-    print '%-40s [max delta: w=%-8f b=%-8f]' % (name_output, weights_maxdelta, biases_maxdelta,)
+    print('%-40s [max delta: w=%-8f b=%-8f]' % (name_output, weights_maxdelta, biases_maxdelta,))
 
 def softmax_write(output_dir, dat_dir, sess):
     name = 'final_training_ops'
@@ -160,8 +161,8 @@ def softmax_write(output_dir, dat_dir, sess):
     weights_output = numpy.zeros(reduce(lambda x,y: x*y, weights.shape), numpy.float32)
 
     output_i = 0
-    for l in xrange(weights.shape[1]):
-        for k in xrange(weights.shape[0]):
+    for l in range(weights.shape[1]):
+        for k in range(weights.shape[0]):
             weights_output[output_i] = weights[k][l]
             output_i += 1
 
@@ -181,20 +182,20 @@ def softmax_write(output_dir, dat_dir, sess):
     biases_dat_filepath  = os.path.join(dat_dir, biases_filename)
     if not os.path.exists(weights_dat_filepath) or \
        not os.path.exists(biases_dat_filepath):
-        print '%-40s' % (name,)
+        print('%-40s' % (name,))
         return
 
     weights_maxdelta = '?'
     with open(weights_dat_filepath, 'rb') as f:
         weights_dat = numpy.fromstring(f.read(), dtype='<f4')
-        weights_maxdelta = max(map(abs, weights_output - weights_dat))
+        weights_maxdelta = max(list(map(abs, weights_output - weights_dat)))
 
     biases_maxdelta = '?'
     with open(biases_dat_filepath) as f:
         biases_dat = numpy.fromstring(f.read(), dtype='<f4')
-        biases_maxdelta = max(map(abs, biases - biases_dat))
+        biases_maxdelta = max(list(map(abs, biases - biases_dat)))
 
-    print '%-40s [max delta: w=%-8f b=%-8f]' % (name, weights_maxdelta, biases_maxdelta,)
+    print('%-40s [max delta: w=%-8f b=%-8f]' % (name, weights_maxdelta, biases_maxdelta,))
 
 #
 # ===== MAIN
